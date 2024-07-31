@@ -1,20 +1,26 @@
-from apiclient import exceptions
+from apiclient.exceptions import (
+    APIRequestError,
+    ClientError,
+    RedirectionError,
+    ServerError,
+    UnexpectedError,
+)
 from apiclient.error_handlers import BaseErrorHandler
 from apiclient.response import Response
 
 
 class VerboseErrorHandler(BaseErrorHandler):
     @staticmethod
-    def get_exception(response: Response) -> exceptions.APIRequestError:
+    def get_exception(response: Response) -> APIRequestError:
         status_code = response.get_status_code()
-        exception_class = exceptions.UnexpectedError
+        exception_class = UnexpectedError
 
         if 300 <= status_code < 400:
-            exception_class = exceptions.RedirectionError
+            exception_class = RedirectionError
         elif 400 <= status_code < 500:
-            exception_class = exceptions.ClientError
+            exception_class = ClientError
         elif 500 <= status_code < 600:
-            exception_class = exceptions.ServerError
+            exception_class = ServerError
 
         return exception_class(
             message=(
